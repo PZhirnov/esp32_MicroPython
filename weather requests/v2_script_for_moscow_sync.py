@@ -7,8 +7,8 @@ import ubinascii
 
 # Конфигурация
 import config
-SSID = SSID
-PASSWORD = PASSWORD
+SSID = config.SSID
+PASSWORD = config.PASSWORD
 
 # API для погоды (пример с OpenWeatherMap)
 API_KEY = "your_api_key_here"  # Зарегистрируйтесь на openweathermap.org для получения ключа
@@ -18,6 +18,11 @@ USE_FREE_API = True  # True для wttr.in, False для OpenWeatherMap
 
 # Светодиод для индикации (обычно встроенный на GPIO2)
 led = Pin(2, Pin.OUT)
+
+def save_in_file(data_txt):
+    with open('history.txt', 'a', encoding='utf-8') as file:
+        file.write('\n'+data_txt)
+
 
 def connect_wifi():
     """Подключение к Wi-Fi сети"""
@@ -56,7 +61,7 @@ def connect_wifi():
         return True
 
 def get_weather_free():
-    """Получение погоды через бесплатное API wttr.in"""
+    """ПолучеÐ½ие погоды через бесплатное API wttr.in"""
     try:
         url = f"https://wttr.in/{CITY}?format=%t+%c+%w+%h&m"
         print(f"Запрос погоды для {CITY}...")
@@ -65,6 +70,7 @@ def get_weather_free():
         
         if response.status_code == 200:
             weather_data = response.text.strip()
+            save_in_file(weather_data)
             print(f"Погода получена: {weather_data}")
             response.close()
             return weather_data
@@ -125,8 +131,8 @@ def display_weather(weather_data):
             print(f"Данные: {weather_data}")
         else:
             print(f"\n=== Погода в {weather_data['city']} ===")
-            print(f"Температура: {weather_data['temperature']}°C")
-            print(f"Ощущается как: {weather_data['feels_like']}°C")
+            print(f"Температура: {weather_data['temperature']}Â°C")
+            print(f"Ощущается как: {weather_data['feels_like']}Â°C")
             print(f"Описание: {weather_data['description']}")
             print(f"Влажность: {weather_data['humidity']}%")
             print(f"Давление: {weather_data['pressure']} гПа")
